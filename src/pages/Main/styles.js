@@ -14,7 +14,7 @@ export const Form = styled.View`
 `;
 
 export const Input = styled.TextInput.attrs({
-  placeholderTextColor: '#888',
+  placeholderTextColor: '#999',
 })`
   flex: 1;
   height: 40px;
@@ -31,6 +31,7 @@ export const SubmitButton = styled(RectButton)`
   border-radius: 4px;
   margin-left: 10px;
   padding: 0 12px;
+  opacity: ${props => (props.loading ? 0.7 : 1)};
 `;
 
 export const List = styled.FlatList.attrs({
@@ -57,8 +58,8 @@ export const Name = styled.Text`
   font-weight: bold;
   margin-top: 4px;
   text-align: center;
-  align-items: center;
 `;
+
 export const Bio = styled.Text.attrs({
   numberOfLines: 2,
 })`
@@ -68,6 +69,7 @@ export const Bio = styled.Text.attrs({
   margin-top: 5px;
   text-align: center;
 `;
+
 export const ProfileButton = styled(RectButton)`
   margin-top: 10px;
   align-self: stretch;
@@ -76,8 +78,8 @@ export const ProfileButton = styled(RectButton)`
   justify-content: center;
   align-items: center;
   height: 36px;
-  opacity: ${props => (props.loading ? 0.7 : 1)};
 `;
+
 export const ProfileButtonText = styled.Text`
   font-size: 14px;
   font-weight: bold;

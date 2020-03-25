@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import PropTypes from 'prop-types';
 import { Keyboard, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import api from '../../services/api';
+
 import {
   Container,
   Form,
@@ -14,18 +18,43 @@ import {
   ProfileButton,
   ProfileButtonText,
 } from './styles';
-import api from '../../services/api';
 
 export default class Main extends Component {
+  static navigationOptions = {
+    title: 'Usuários',
+  };
+
+  static propTypes = {
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func,
+    }).isRequired,
+  };
+
   state = {
     newUser: '',
     users: [],
     loading: false,
   };
 
+  async componentDidMount() {
+    const users = await AsyncStorage.getItem('users');
+
+    if (users) {
+      this.setState({ users: JSON.parse(users) });
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    const { users } = this.state;
+
+    if (prevState.users !== users) {
+      AsyncStorage.setItem('users', JSON.stringify(users));
+    }
+  }
+
   handleAddUser = async () => {
-    console.tron.log(this.state.newUser);
     const { users, newUser } = this.state;
+
     this.setState({ loading: true });
 
     const response = await api.get(`/users/${newUser}`);
@@ -46,15 +75,22 @@ export default class Main extends Component {
     Keyboard.dismiss();
   };
 
+  handleNavigate = user => {
+    const { navigation } = this.props;
+
+    navigation.navigate('User', { user });
+  };
+
   render() {
     const { users, newUser, loading } = this.state;
+
     return (
       <Container>
         <Form>
           <Input
             autoCorrect={false}
             autoCapitalize="none"
-            placeholder="Adicionar Usuário"
+            placeholder="Adicionar usuário"
             value={newUser}
             onChangeText={text => this.setState({ newUser: text })}
             returnKeyType="send"
@@ -62,9 +98,9 @@ export default class Main extends Component {
           />
           <SubmitButton loading={loading} onPress={this.handleAddUser}>
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color="#FFF" />
             ) : (
-              <Icon name="add" size={29} color="#eee" />
+              <Icon name="add" size={20} color="#FFF" />
             )}
           </SubmitButton>
         </Form>
@@ -77,7 +113,8 @@ export default class Main extends Component {
               <Avatar source={{ uri: item.avatar }} />
               <Name>{item.name}</Name>
               <Bio>{item.bio}</Bio>
-              <ProfileButton onpress={() => {}}>
+
+              <ProfileButton onPress={() => this.handleNavigate(item)}>
                 <ProfileButtonText>Ver perfil</ProfileButtonText>
               </ProfileButton>
             </User>
@@ -87,7 +124,3 @@ export default class Main extends Component {
     );
   }
 }
-
-Main.navigationOptions = {
-  title: 'Olá Mundo!!!',
-};
